@@ -1,4 +1,14 @@
-""""
+"""
+a Constraint Satisfaction Problem (CSP). In this case, the constraints involve 
+ensuring that numbers don't repeat in rows, the column sums match the given targets,
+and adjacent cells have different digits. 
+the constraint-satisfaction library python-constraint. 
+ You can install it using:
+ 
+ pip install python-constraint
+"""
+
+"""
 This program defines a function create_tenner_grid_problem
 to set up the CSP and another function solve_tenner_grid to find solutions.
 You can customize the rows, cols, and 
