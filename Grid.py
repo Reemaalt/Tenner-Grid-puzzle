@@ -17,7 +17,7 @@ column_sums variables to configure the puzzle size and column sums
 """
 import time
 from constraint import Problem, AllDifferentConstraint, ExactSumConstraint
-
+#ريما
 def create_tenner_grid_problem(rows, cols, sums):
     """
     Create a Tenner Grid CSP problem instance.
@@ -53,7 +53,7 @@ def create_tenner_grid_problem(rows, cols, sums):
             problem.addConstraint(lambda a, b: a != b, ((row, col), (row + 1, col + 1)))
 
     return problem
-
+#نوف
 def solve_tenner_grid(problem):
     """
     Solve the Tenner Grid CSP problem using backtracking.
@@ -66,7 +66,7 @@ def solve_tenner_grid(problem):
     """
     solutions = problem.getSolutions()
     return solutions
-
+#نورة
 def solve_tenner_grid_fc(problem):
     """
     Solve the Tenner Grid CSP problem using forward checking.
@@ -82,7 +82,7 @@ def solve_tenner_grid_fc(problem):
     for solution in problem.getSolutionIter():
         solutions.append(solution)
     return solutions
-
+#نوره 
 def solve_tenner_grid_fc_mrv(problem):
     """
     Solve the Tenner Grid CSP problem using forward checking with MRV heuristic.
@@ -131,12 +131,15 @@ def compare_algorithms(problem):
     print("Number of solutions:", len(solutions_fc_mrv))
     print("Time taken:", time_fc_mrv)
 
-# Example configuration: 10 by 4 Tenner Grid Puzzle
+
+
+
+#needed varibles/c
 rows = 10
 cols = 4
 column_sums = [18, 24, 16, 22]
 
-# Create the Tenner Grid problem instance
+# call Create the Tenner Grid problem instance
 tenner_grid_problem = create_tenner_grid_problem(rows, cols, column_sums)
 
 # Compare different CSP algorithms for solving the problem
