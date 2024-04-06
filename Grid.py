@@ -1,20 +1,34 @@
 """
-a Constraint Satisfaction Problem (CSP). In this case, the constraints involve 
-ensuring that numbers don't repeat in rows, the column sums match the given targets,
-and adjacent cells have different digits. 
-the constraint-satisfaction library python-constraint. 
- You can install it using:
- 
- pip install python-constraint
-"""
-
-"""
 This program defines a function create_tenner_grid_problem
 to set up the CSP and another function solve_tenner_grid to find solutions.
 You can customize the rows, cols, and 
 column_sums variables to configure the puzzle size and column sums
 . The here configuration is for a 10 by 4 Tenner Grid Puzzle.
 """
+#checking the packages code
+import importlib.util
+import subprocess
+
+def install_package(package):
+    subprocess.check_call(["pip", "install", package])
+
+def check_and_install(package):
+    spec = importlib.util.find_spec(package)
+    if spec is None:
+        print(f"The package '{package}' is not installed. Installing...")
+        install_package(package)
+        print(f"The package '{package}' has been successfully installed.")
+    else:
+        print(f"The package '{package}' is already installed.")
+
+# List of packages to check/install
+packages_to_check = ["python-constraint"]
+
+# Check and install packages if necessary
+for package in packages_to_check:
+    check_and_install(package)
+
+#the project code
 import time
 from constraint import Problem, AllDifferentConstraint, ExactSumConstraint
 #ريما
@@ -133,15 +147,17 @@ def compare_algorithms(problem):
 
 
 
+def main():
+    # Configuration for the Tenner Grid problem
+    rows = 10
+    cols = 4
+    column_sums = [18, 24, 16, 22]
 
-#needed varibles/c
-rows = 10
-cols = 4
-column_sums = [18, 24, 16, 22]
+    # Create the Tenner Grid problem instance
+    tenner_grid_problem = create_tenner_grid_problem(rows, cols, column_sums)
 
-# call Create the Tenner Grid problem instance
-tenner_grid_problem = create_tenner_grid_problem(rows, cols, column_sums)
+    # Compare different CSP algorithms for solving the problem
+    compare_algorithms(tenner_grid_problem)
 
-# Compare different CSP algorithms for solving the problem
-compare_algorithms(tenner_grid_problem)
-
+if __name__ == "__main__":
+    main()
