@@ -33,17 +33,7 @@ import time
 from constraint import Problem, AllDifferentConstraint, ExactSumConstraint
 #ريما
 def create_tenner_grid_problem(rows, cols, sums):
-    """
-    Create a Tenner Grid CSP problem instance.
-
-    Args:
-        rows (int): Number of rows in the grid.
-        cols (int): Number of columns in the grid.
-        sums (list): List of column sums.
-
-    Returns:
-        Problem: The CSP problem instance.
-    """
+   
     problem = Problem()
 
     # Add variables for each cell in the grid
