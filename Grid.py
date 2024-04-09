@@ -56,6 +56,13 @@ class TennerGridCSP:
         def constraint(*values):
             return sum(values) == target_sum
         return constraint
+
+def generate_random_puzzle(column_sums):
+    puzzle = TennerGridCSP(column_sums)
+    for var in puzzle.variables:
+        value = random.choice(puzzle.domain[var])
+        puzzle.grid[var[0]][var[1]] = value
+    return puzzle
 #نوف
 def solve_tenner_grid(problem):
     solutions = problem.getSolutions()
@@ -101,12 +108,7 @@ def compare_algorithms(problem):
     print("Number of solutions:", len(solutions_fc_mrv))
     print("Time taken:", time_fc_mrv)
 
-def generate_random_puzzle(column_sums):
-    puzzle = TennerGridCSP(column_sums)
-    for var in puzzle.variables:
-        value = random.choice(puzzle.domain[var])
-        puzzle.grid[var[0]][var[1]] = value
-    return puzzle
+
 
 def main():
     # Check and install packages if necessary
