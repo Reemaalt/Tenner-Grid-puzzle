@@ -178,7 +178,7 @@ def generate_random_puzzle(grid_size):
 
 def main():
 
-    grid_sizes = [10]  # Adjusted for 10x3 Tenner Grid Puzzles
+    grid_sizes = [3]  # Adjusted for 10x3 Tenner Grid Puzzles
     algorithms = {
         "Simple Backtracking": TennerGridCSP.backtracking_search,
         "Forward Checking": TennerGridCSP.forward_checking,
@@ -225,34 +225,5 @@ def main():
             print("Median Number of Variable Assignments:", median_variable_assignments)
             print("\n")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
- 
-""""Alright, let's break it down:
-
-Puzzle Representation:
-
-Imagine a game where you have a grid of 10 rows and 3 columns (but it can be adjusted).
-Each cell in this grid can hold a number from 1 to 10.
-Goal:
-
-The goal is to fill in each cell of the grid with a number from 1 to 10 in such a way that certain rules are satisfied.
-Rules:
-
-The numbers in each row must be unique (no repeating numbers within a row).
-Certain pairs of neighboring cells must have their numbers in a specific relationship, like one being greater than the other.
-How the Program Solves the Puzzle:
-
-The program tries different strategies to find a solution to the puzzle.
-It has three main strategies: simple backtracking, forward checking, and forward checking with MRV (which is a more efficient version).
-These strategies work by guessing numbers for the cells, checking if the guesses follow the rules, and adjusting if they don't until a solution is found.
-What the Program Does:
-
-It first creates a random puzzle grid.
-Then, it tries each solving strategy multiple times to see which one works best.
-It measures how many times it needs to check if the guesses follow the rules (consistency checks) and how many guesses it needs to make (variable assignments).
-Finally, it prints out the median (middle value) of these measurements to give an idea of how efficient each strategy is.
-The Output:
-
-After trying each strategy multiple times, the program shows which strategy worked best and how many consistency checks and variable assignments were needed on average to solve the puzzle.
-In simple terms, the program is like a smart kid trying different ways to solve a puzzle and figuring out which way is the fastest and most efficient."""
