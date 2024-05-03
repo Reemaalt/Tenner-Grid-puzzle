@@ -2,13 +2,14 @@ import random
 import time
 
 class TennerGridCSP:
+    
     def __init__(self, grid_size):
         self.grid_size = grid_size
         self.grid = [[0] * grid_size for _ in range(10)]  # Initialize grid
         self.variables = [(i, j) for i in range(10) for j in range(grid_size)]  # List of variables
         self.domain = {var: list(range(1, 11)) for var in self.variables}  # Domain of each variable
         self.constraints = self.generate_constraints()  # Generate constraints
-        self.num_variable_assignments = 1  # Counter for variable assignments
+        self.num_variable_assignments = 0  # Counter for variable assignments
         self.num_consistency_checks = 0  # Counter for consistency checks
 
     def generate_constraints(self):
@@ -132,17 +133,17 @@ class TennerGridCSP:
         for row in self.grid:
             print(row)
 
-def solve_puzzle(puzzle, solver_func):
+def solve_puzzle(self, solver_func):
     start_time = time.time()
-    puzzle.num_variable_assignments = 0
-    puzzle.num_consistency_checks = 0
+    self.num_variable_assignments = 0
+    self.num_consistency_checks = 0
     assignment = solver_func({})
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
-    print("Number of variable assignments:", puzzle.num_variable_assignments)
-    print("Number of consistency checks:", puzzle.num_consistency_checks)
+    print("Number of variable assignments:", self.num_variable_assignments)
+    print("Number of consistency checks:", self.num_consistency_checks)
     print("\nFinal state:")
-    puzzle.print_grid()
+    self.print_grid()
 
 
 def main():
