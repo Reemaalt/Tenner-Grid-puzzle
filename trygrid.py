@@ -1,5 +1,4 @@
 import random
-import copy
 import time
 
 class TennerGridSolver:
@@ -15,7 +14,9 @@ class TennerGridSolver:
             column_sum = random.randint(0, 45)  # Random sum for each column
             self.column_sums[j] = column_sum
             self.constraints.add((j, column_sum))
-        self.solve_backtracking()  # Solve using backtracking to generate initial state
+        self.initial_grid = [row[:] for row in self.grid]  # Store the initial state
+        self.num_assignments = 0
+        self.num_consistency_checks = 0
 
     def print_grid(self):
         for row in self.grid:
@@ -37,13 +38,20 @@ class TennerGridSolver:
         return True
 
     def solve_backtracking(self):
+        start_time = time.time()
         self.backtracking(0, 0)
+        end_time = time.time()
+        print("Time taken to solve (Backtracking):", end_time - start_time, "seconds")
+        print("Number of variable assignments:", self.num_assignments)
+        print("Number of consistency checks:", self.num_consistency_checks)
 
     def backtracking(self, row, col):
+        self.num_consistency_checks += 1
         if row == self.height:
             return True
 
         for num in range(10):
+            self.num_assignments += 1
             if self.is_valid(row, col, num):
                 self.grid[row][col] = num
                 next_row = row + 1 if col == self.width - 1 else row
@@ -54,13 +62,22 @@ class TennerGridSolver:
         return False
 
     def solve_forward_checking(self):
+        start_time = time.time()
+        self.num_assignments = 0
+        self.num_consistency_checks = 0
         self.forward_checking(0, 0, set())
+        end_time = time.time()
+        print("Time taken to solve (Forward Checking):", end_time - start_time, "seconds")
+        print("Number of variable assignments:", self.num_assignments)
+        print("Number of consistency checks:", self.num_consistency_checks)
 
     def forward_checking(self, row, col, assigned):
+        self.num_consistency_checks += 1
         if row == self.height:
             return True
 
         for num in range(10):
+            self.num_assignments += 1
             if num not in assigned and self.is_valid(row, col, num):
                 self.grid[row][col] = num
                 next_row = row + 1 if col == self.width - 1 else row
@@ -73,9 +90,17 @@ class TennerGridSolver:
         return False
 
     def solve_forward_checking_mrv(self):
+        start_time = time.time()
+        self.num_assignments = 0
+        self.num_consistency_checks = 0
         self.forward_checking_mrv(0, 0, set())
+        end_time = time.time()
+        print("Time taken to solve (Forward Checking + MRV):", end_time - start_time, "seconds")
+        print("Number of variable assignments:", self.num_assignments)
+        print("Number of consistency checks:", self.num_consistency_checks)
 
     def forward_checking_mrv(self, row, col, assigned):
+        self.num_consistency_checks += 1
         if row == self.height:
             return True
 
@@ -84,6 +109,7 @@ class TennerGridSolver:
 
         for var_row, var_col in unassigned_vars:
             for num in range(10):
+                self.num_assignments += 1
                 if num not in assigned and self.is_valid(var_row, var_col, num):
                     self.grid[var_row][var_col] = num
                     assigned.add(num)
@@ -101,30 +127,21 @@ def main():
     print("Initial state:")
     solver.print_grid()
     print("\nSolving using Backtracking:")
-    start_time = time.time()
     solver.solve_backtracking()
-    end_time = time.time()
-    print("Time taken to solve (Backtracking):", end_time - start_time, "seconds")
     print("\nFinal state:")
     solver.print_grid()
 
     solver = TennerGridSolver(width, height)
     solver.generate_puzzle()
     print("\nSolving using Forward Checking:")
-    start_time = time.time()
     solver.solve_forward_checking()
-    end_time = time.time()
-    print("Time taken to solve (Forward Checking):", end_time - start_time, "seconds")
     print("\nFinal state:")
     solver.print_grid()
 
     solver = TennerGridSolver(width, height)
     solver.generate_puzzle()
     print("\nSolving using Forward Checking with MRV:")
-    start_time = time.time()
     solver.solve_forward_checking_mrv()
-    end_time = time.time()
-    print("Time taken to solve (Forward Checking + MRV):", end_time - start_time, "seconds")
     print("\nFinal state:")
     solver.print_grid()
 
