@@ -1,6 +1,5 @@
 import random
 import time
-import statistics
 
 class TennerGridCSP:
     def __init__(self, grid_size):
@@ -9,7 +8,7 @@ class TennerGridCSP:
         self.variables = [(i, j) for i in range(10) for j in range(grid_size)]  # List of variables
         self.domain = {var: list(range(1, 11)) for var in self.variables}  # Domain of each variable
         self.constraints = self.generate_constraints()  # Generate constraints
-        self.num_variable_assignments = 0  # Counter for variable assignments
+        self.num_variable_assignments = 1  # Counter for variable assignments
         self.num_consistency_checks = 0  # Counter for consistency checks
 
     def generate_constraints(self):
@@ -133,11 +132,11 @@ class TennerGridCSP:
         for row in self.grid:
             print(row)
 
-def solve_puzzle(puzzle, solver):
+def solve_puzzle(puzzle, solver_func):
     start_time = time.time()
     puzzle.num_variable_assignments = 0
     puzzle.num_consistency_checks = 0
-    assignment = solver()
+    assignment = solver_func({})
     end_time = time.time()
     print("Time taken to solve:", end_time - start_time, "seconds")
     print("Number of variable assignments:", puzzle.num_variable_assignments)
@@ -150,19 +149,48 @@ def main():
     num_puzzles = 10
     grid_size = 3
     solvers = {
-        "Backtracking": TennerGridCSP().backtracking_search,
-        "Forward Checking": TennerGridCSP().forward_checking,
-        "Forward Checking + MRV": TennerGridCSP().forward_checking_mrv
+        "Backtracking": TennerGridCSP(grid_size).backtracking_search,
+        "Forward Checking": TennerGridCSP(grid_size).forward_checking,
+        "Forward Checking + MRV": TennerGridCSP(grid_size).forward_checking_mrv
     }
 
-    for i in range(num_puzzles):
-        print(f"\nPuzzle {i+1}:")
-        puzzle = TennerGridCSP(grid_size)
-        puzzle.generate_puzzle()
-        puzzle.print_grid()
-        for solver_name, solver_func in solvers.items():
-            print(f"\nSolving with {solver_name}:")
-            solve_puzzle(puzzle, solver_func)
+    median_checks = {solver_name: [] for solver_name in solvers.keys()}
+
+    for _ in range(5):  # Five runs
+        algorithm_checks = {solver_name: [] for solver_name in solvers.keys()}
+        for i in range(num_puzzles):
+            puzzle = TennerGridCSP(grid_size)
+            puzzle.generate_puzzle()
+            for solver_name, solver_func in solvers.items():
+                start_time = time.time()
+                puzzle.num_variable_assignments = 0
+                puzzle.num_consistency_checks = 0
+                assignment = solver_func({})
+                end_time = time.time()
+                print(f"\nPuzzle {i+1} - Solving with {solver_name}:")
+                print("Initial state:")
+                puzzle.print_grid()
+                print("Final state:")
+                puzzle.print_grid() if assignment is not None else print("No solution found.")
+                print("Time taken to solve:", end_time - start_time, "seconds")
+                print("Number of variable assignments:", puzzle.num_variable_assignments)
+                print("Number of consistency checks:", puzzle.num_consistency_checks)
+                algorithm_checks[solver_name].append(puzzle.num_consistency_checks)
+        # Calculate median number of consistency checks for each algorithm
+        for solver_name, checks in algorithm_checks.items():
+            checks.sort()
+            median = checks[len(checks)//2] if len(checks) % 2 != 0 else (checks[len(checks)//2 - 1] + checks[len(checks)//2]) / 2
+            median_checks[solver_name].append(median)
+    
+    # Calculate median of medians
+    final_median_checks = {}
+    for solver_name, median_list in median_checks.items():
+        final_median_checks[solver_name] = sum(median_list) / len(median_list)
+
+    # Print results
+    print("\nMedian number of consistency checks over five runs:")
+    for solver_name, final_median_check in final_median_checks.items():
+        print(f"{solver_name}: {final_median_check}")
 
 if __name__ == "__main__":
     main()

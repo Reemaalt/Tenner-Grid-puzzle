@@ -212,8 +212,7 @@ def main():
             print("Median Number of Variable Assignments:", median_variable_assignments)
             print("\n")
 
-if __name__ == "__main__":
-    main()
+
  
 """"Alright, let's break it down:
 
