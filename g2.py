@@ -6,15 +6,17 @@ from copy import deepcopy
 #class represents the Tenner Grid CSP (Constraint Satisfaction Problem).
 class TennerGridCSP:
      # methods for initializing the CSP, generating constraints, checking consistency and selecting variables
-    def __init__(self, grid_size):
+    def _init_(self, grid_size):
      # Constructor to initialize the Tenner Grid CSP
         self.grid_size = grid_size
-        self.grid = [[0] * grid_size for _ in range(10)]  # Initialize grid
+        self.grid = [[random.randint(0, 9) for _ in range(grid_size)] for _ in range(10)]  # Initialize grid
         self.variables = [(i, j) for i in range(10) for j in range(grid_size)]  # List of variables
         self.domain = {var: list(range(1, 11)) for var in self.variables}  # Domain of each variable
         self.constraints = self.generate_constraints()  # Generate constraints
         self.num_variable_assignments = 0  # Counter for variable assignments
         self.num_consistency_checks = 0  # Counter for consistency checks
+          
+          
 
     def generate_constraints(self):
         # Method to generate constraints for the CSP
@@ -155,13 +157,24 @@ class TennerGridCSP:
             print(row)
 
 
+
+import random
+
 def generate_random_puzzle(grid_size):
     # Function to generate a random unsolved puzzle
     puzzle = TennerGridCSP(grid_size)
+    
+    # Initialize the grid with random numbers and empty cells indicated by -1
     for var in puzzle.variables:
-        # Fill the grid with zeros initially
-        puzzle.grid[var[0]][var[1]] = 0
+        puzzle.grid[var[0]][var[1]] = random.randint(-1, 10)
+    
+    # Calculate the sum for each column and assign it to the bottom cell
+    for j in range(grid_size):
+        column_sum = sum(puzzle.grid[i][j] for i in range(10) if puzzle.grid[i][j] != -1)
+        puzzle.grid[9][j] = column_sum
+    
     return puzzle
+
 
 def main():
 
@@ -186,7 +199,7 @@ def main():
 
             for _ in range(5):  # Run each algorithm 5 times and calculate median
                 puzzle = generate_random_puzzle(grid_size)
-                if algorithm.__name__ == "backtracking_search":
+                if algorithm._name_ == "backtracking_search":
                     solution = algorithm(puzzle)
                 else:
                     solution = algorithm(puzzle)
@@ -212,7 +225,8 @@ def main():
             print("Median Number of Variable Assignments:", median_variable_assignments)
             print("\n")
 
-
+if _name_ == "_main_":
+    main()
  
 """"Alright, let's break it down:
 
@@ -241,4 +255,4 @@ Finally, it prints out the median (middle value) of these measurements to give a
 The Output:
 
 After trying each strategy multiple times, the program shows which strategy worked best and how many consistency checks and variable assignments were needed on average to solve the puzzle.
-In simple terms, the program is like a smart kid trying different ways to solve a puzzle and figuring out which way is the fastest and most efficient."""
+In simple terms, the program is like a smart kid trying different ways to solve a puzzle and figuring out which way is the fastest and most efficient."""
