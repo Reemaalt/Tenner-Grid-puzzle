@@ -20,10 +20,14 @@ class TennerGrid:
     # Method to generate a random Tenner Grid puzzle
     @staticmethod
     def generate_puzzle():
-        grid = [[-1 for _ in range(TennerGrid.COLUMNS)] for _ in range(TennerGrid.ROWS)]
+        grid = [[None for _ in range(TennerGrid.COLUMNS)] for _ in range(TennerGrid.ROWS)]
+        column_sums = [random.randint(0, 18) for _ in range(TennerGrid.COLUMNS)]  # Generate random column sums
         for i in range(TennerGrid.ROWS):
             for j in range(TennerGrid.COLUMNS):
-                if random.random() < 0.5:
+                if i == TennerGrid.ROWS - 1:  # For the bottom row
+                 grid[i][j] = column_sums[j]  # Assign the random sum
+                else:
+                  if random.random() < 0.5:
                     grid[i][j] = random.randint(0, 9)
         return grid
 
@@ -184,12 +188,12 @@ class TennerGrid:
     def print_grid(grid):
         print("\nFinal CSP Tenner Variable Assignments:")
         for i in range(TennerGrid.ROWS):
-            print("|", end="")
+            
             for j in range(TennerGrid.COLUMNS):
                 if grid[i][j] is not None:
-                    print(f" {grid[i][j]:>2} ", end="")
+                   print(f"| {grid[i][j]:^3} ", end="")
                 else:
-                    print("   ", end="")
+                    print("|     ", end="")
             print("|")
 
 
@@ -197,12 +201,12 @@ class TennerGrid:
     def print_initial_state(grid):
         print("\nInitial State:")
         for i in range(TennerGrid.ROWS):
-            print("|", end="")
+            
             for j in range(TennerGrid.COLUMNS):
                 if grid[i][j] is not None:
-                    print(f" {grid[i][j]:>2} ", end="")
+                     print(f"| {grid[i][j]:^3} ", end="")
                 else:
-                    print("   ", end="")
+                     print("|     ", end="")
             print("|")
 
 

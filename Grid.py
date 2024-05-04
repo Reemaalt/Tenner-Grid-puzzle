@@ -28,8 +28,8 @@ class TennerGridCSP:
                     var2 = (i, k)
                     if (var1, var2) not in constraints:
                         constraints[(var1, var2)] = []
-                    for val1 in range(1, 11):
-                        for val2 in range(1, 11):
+                    for val1 in range(1, 10):
+                        for val2 in range(1, 10):
                             if val1 != val2:
                                 constraints[(var1, var2)].append((val1, val2))
         return constraints
@@ -52,6 +52,7 @@ class TennerGridCSP:
     #algorithms to solve like backtracking, forward checking, and forward checking with MRV.
     def backtracking_search(self):
         # Method implementing backtracking search algorithm
+        initial = generate_random_puzzle(grid_size)
         return self.backtrack({}, self.domain)
     
     def backtrack(self, assignment, remaining):
@@ -178,7 +179,7 @@ def generate_random_puzzle(grid_size):
 
 def main():
 
-    grid_sizes = [10]  # Adjusted for 10x3 Tenner Grid Puzzles
+    grid_sizes = [3]  # Adjusted for 10x3 Tenner Grid Puzzles
     algorithms = {
         "Simple Backtracking": TennerGridCSP.backtracking_search,
         "Forward Checking": TennerGridCSP.forward_checking,
