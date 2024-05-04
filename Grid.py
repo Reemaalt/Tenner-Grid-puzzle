@@ -158,7 +158,7 @@ class TennerGridCSP:
 
 
 
-import random
+
 
 def generate_random_puzzle(grid_size):
     # Function to generate a random unsolved puzzle
@@ -166,7 +166,7 @@ def generate_random_puzzle(grid_size):
     
     # Initialize the grid with random numbers and empty cells indicated by -1
     for var in puzzle.variables:
-        puzzle.grid[var[0]][var[1]] = random.randint(-1, 10)
+        puzzle.grid[var[0]][var[1]] = random.randint(-1, 9)
     
     # Calculate the sum for each column and assign it to the bottom cell
     for j in range(grid_size):
