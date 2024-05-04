@@ -1,168 +1,137 @@
 import random
 import time
-import statistics
 
-class TennerGridCSP:
-    def __init__(self, grid_size):
+class TennerGridSolver:
+    def __init__(self, grid_size=(3, 10)):
         self.grid_size = grid_size
-        self.grid = [[0] * grid_size for _ in range(10)]  # Initialize grid
-        self.variables = [(i, j) for i in range(10) for j in range(grid_size)]  # List of variables
-        self.domain = {var: list(range(1, 11)) for var in self.variables}  # Domain of each variable
-        self.constraints = self.generate_constraints()  # Generate constraints
-        self.num_variable_assignments = 0  # Counter for variable assignments
-        self.num_consistency_checks = 0  # Counter for consistency checks
+        self.grid = [[0] * grid_size[1] for _ in range(grid_size[0])]
+        self.row_constraints = [0] * grid_size[0]
+        self.col_constraints = [0] * grid_size[1]
+        self.variable_assignments = 0
+        self.consistency_checks = 0
 
-    def generate_constraints(self):
-        # Method to generate constraints for the CSP
-        constraints = {}
-        for i in range(10):
-            for j in range(self.grid_size - 1):
-                for k in range(j + 1, self.grid_size):
-                    var1 = (i, j)
-                    var2 = (i, k)
-                    if (var1, var2) not in constraints:
-                        constraints[(var1, var2)] = []
-                    for val1 in range(1, 11):
-                        for val2 in range(1, 11):
-                            if val1 != val2:
-                                constraints[(var1, var2)].append((val1, val2))
-        return constraints
+    def solve(self):
+        start_time = time.time()
+        solution = self.backtrack_search()
+        end_time = time.time()
+        time_taken = end_time - start_time
+        return solution, time_taken
 
-    def is_consistent(self, var, value, assignment):
-        # Method to check consistency of a variable assignment
-        for other_var in assignment:
-            if other_var != var and (other_var, var) in self.constraints:
-                if (assignment[other_var], value) not in self.constraints[(other_var, var)]:
-                    self.num_consistency_checks += 1  # Increment consistency check counter
+    def backtrack_search(self):
+        assignment = {}
+        return self.backtrack(assignment)
+
+    def backtrack(self, assignment):
+        if len(assignment) == self.grid_size[0] * self.grid_size[1]:
+            return assignment
+
+        row, col = self.select_unassigned_variable(assignment)
+        remaining_values = self.get_remaining_values(row, col, assignment)
+        for value in remaining_values:
+            self.consistency_checks += 1
+            if self.is_valid_assignment(row, col, value):
+                assignment[(row, col)] = value
+                self.variable_assignments += 1
+                result = self.backtrack(assignment)
+                if result is not None:
+                    return result
+                del assignment[(row, col)]
+        return None
+
+    def select_unassigned_variable(self, assignment):
+        for i in range(self.grid_size[0]):
+            for j in range(self.grid_size[1]):
+                if (i, j) not in assignment:
+                    return i, j
+        return -1, -1  # Grid is complete
+
+    def is_valid_assignment(self, row, col, value):
+        self.consistency_checks += 1
+        if value in self.grid[row]:
+            return False
+
+        if self.row_constraints[row] != 0:
+            if sum(self.grid[row]) + value > self.row_constraints[row]:
+                return False
+
+        if self.col_constraints[col] != 0:
+            col_sum = sum(self.grid[i][col] for i in range(self.grid_size[0]) if self.grid[i][col] >= 0)
+            if col_sum + value > self.col_constraints[col]:
+                return False
+
+        if not self.check_adjacent_cells(row, col, value):
+            return False
+
+        return True
+
+    def check_adjacent_cells(self, row, col, value):
+        adjacent_positions = [
+            (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+            (row, col - 1),                     (row, col + 1),
+            (row + 1, col - 1), (row + 1, col), (row + 1, col + 1)
+        ]
+        for r, c in adjacent_positions:
+            if 0 <= r < self.grid_size[0] and 0 <= c < self.grid_size[1]:
+                if self.grid[r][c] == value:
                     return False
         return True
 
-    def select_unassigned_variable(self, assignment):
-        # Method to select an unassigned variable
-        unassigned = [(var, len(self.domain[var])) for var in self.variables if var not in assignment]
-        return min(unassigned, key=lambda x: x[1])[0]
+    def generate_random_grid(self, max_attempts=10):
+        for _ in range(max_attempts):
+            # Generate a random grid with random numbers
+            for i in range(self.grid_size[0]):
+                for j in range(self.grid_size[1]):
+                    # Introduce randomness by setting some cells to 0
+                    self.grid[i][j] = random.randint(0, 9)
 
-    def backtracking_search(self, assignment={}):
-        # Method for solving CSP using backtracking search
-        if len(assignment) == len(self.variables):
-            return assignment  # If all variables are assigned, return assignment
-        var = self.select_unassigned_variable(assignment)  # Select an unassigned variable
-        for value in self.domain[var]:
-            if self.is_consistent(var, value, assignment):
-                assignment[var] = value  # Assign the value to the variable
-                self.num_variable_assignments += 1  # Increment assignment counter
-                result = self.backtracking_search(assignment.copy())  # Recursively search
-                if result is not None:
-                    return result  # If solution found, return it
-                del assignment[var]  # Remove variable from assignment if no solution found
-        return None  # If no solution found, return None
+            # Set column sums to random values
+            self.col_constraints = [random.randint(0, 45) for _ in range(self.grid_size[1])]
 
-    def forward_checking(self, assignment):
-        # Method to solve CSP using forward checking
-        # Implementation similar to backtracking, with additional constraint propagation
-        if len(assignment) == len(self.variables):
-            return assignment  # If all variables are assigned, return assignment
-        var = self.select_unassigned_variable(assignment)  # Select an unassigned variable
-        for value in self.domain[var]:
-            if self.is_consistent(var, value, assignment):
-                assignment[var] = value  # Assign the value to the variable
-                self.num_variable_assignments += 1  # Increment assignment counter
-                inferences = self.propagate_forward_checking(var, value, assignment)
-                if inferences is not None:
-                    result = self.forward_checking(assignment.copy())
-                    if result is not None:
-                        return result  # If solution found, return it
-                self.undo_inferences(inferences, assignment)  # Undo inferences
-                del assignment[var]  # Remove variable from assignment if no solution found
-        return None  # If no solution found, return None
+            
 
-    def propagate_forward_checking(self, var, value, assignment):
-        # Method to perform constraint propagation (forward checking)
-        inferences = {}
-        for neighbor_var in self.variables:
-            if neighbor_var != var and neighbor_var not in assignment:
-                if (neighbor_var, var) in self.constraints:
-                    for neighbor_value in self.domain[neighbor_var][:]:
-                        if (neighbor_value, value) not in self.constraints[(neighbor_var, var)]:
-                            self.num_consistency_checks += 1
-                            self.domain[neighbor_var].remove(neighbor_value)
-                            if len(self.domain[neighbor_var]) == 0:
-                                # Inconsistency detected
-                                self.restore_domain(inferences)
-                                return None
-                            inferences[neighbor_var] = neighbor_value
-        return inferences
 
-    def undo_inferences(self, inferences, assignment):
-        # Method to undo inferences during backtracking
-        for var, value in inferences.items():
-            self.domain[var].append(value)
-            del assignment[var]
+    def is_solvable(self):
+        for j in range(self.grid_size[1]):
+            col_sum = sum(self.grid[i][j] for i in range(self.grid_size[0]) if self.grid[i][j] >= 0)
+            if self.col_constraints[j] != 0 and col_sum != self.col_constraints[j]:
+                return False
+        return True
 
-    def restore_domain(self, inferences):
-        # Method to restore domain during backtracking
-        for var, value in inferences.items():
-            self.domain[var].append(value)
+    def get_remaining_values(self, row, col, assignment):
+        remaining_values = set(range(10))
+        for r in range(self.grid_size[0]):
+            for c in range(self.grid_size[1]):
+                if (r, c) in assignment:
+                    remaining_values.discard(assignment[(r, c)])
+        return remaining_values
 
-    def forward_checking_mrv(self, assignment):
-        # Method to solve CSP using forward checking with MRV heuristic
-        if len(assignment) == len(self.variables):
-            return assignment  # If all variables are assigned, return assignment
-        var = self.select_unassigned_variable(assignment)  # Select an unassigned variable
-        for value in self.domain[var]:
-            if self.is_consistent(var, value, assignment):
-                assignment[var] = value  # Assign the value to the variable
-                self.num_variable_assignments += 1  # Increment assignment counter
-                inferences = self.propagate_forward_checking(var, value, assignment)
-                if inferences is not None:
-                    result = self.forward_checking_mrv(assignment.copy())
-                    if result is not None:
-                        return result  # If solution found, return it
-                self.undo_inferences(inferences, assignment)  # Undo inferences
-                del assignment[var]  # Remove variable from assignment if no solution found
-        return None  # If no solution found, return None
-
-    def generate_puzzle(self):
-        # Method to randomly generate a Tenner Grid puzzle
-        for var in self.variables:
-            value = random.choice(self.domain[var])
-            self.grid[var[0]][var[1]] = value
-
-    def print_grid(self):
-        # Method to print the Tenner Grid puzzle
+    def print_grid(self, message=""):
+        if message:
+            print(message)
         for row in self.grid:
             print(row)
 
-def solve_puzzle(puzzle, solver):
-    start_time = time.time()
-    puzzle.num_variable_assignments = 0
-    puzzle.num_consistency_checks = 0
-    assignment = solver()
-    end_time = time.time()
-    print("Time taken to solve:", end_time - start_time, "seconds")
-    print("Number of variable assignments:", puzzle.num_variable_assignments)
-    print("Number of consistency checks:", puzzle.num_consistency_checks)
-    print("\nFinal state:")
+    def print_solution_info(self, time_taken):
+        print("\nFinal CSP Tenner Variable Assignments:")
+        self.print_grid()
+        print("\nNumber of Variable Assignments:", self.variable_assignments)
+        print("Number of Consistency Checks:", self.consistency_checks)
+        print("\nTime Used to Solve the Problem:", time_taken)
+
+# Example usage:
+if __name__ == "__main__":
+    puzzle = TennerGridSolver(grid_size=(3, 10))
+    # Adjusting constraints according to Tenner Grids math puzzles rules
+    puzzle.row_constraints = [10, 15, 12]  # Example row sums
+
+    print("Randomly generated unsolved grid:")
+    puzzle.generate_random_grid()
     puzzle.print_grid()
 
-
-def main():
-    num_puzzles = 10
-    grid_size = 3
-    solvers = {
-        "Backtracking": TennerGridCSP().backtracking_search,
-        "Forward Checking": TennerGridCSP().forward_checking,
-        "Forward Checking + MRV": TennerGridCSP().forward_checking_mrv
-    }
-
-    for i in range(num_puzzles):
-        print(f"\nPuzzle {i+1}:")
-        puzzle = TennerGridCSP(grid_size)
-        puzzle.generate_puzzle()
-        puzzle.print_grid()
-        for solver_name, solver_func in solvers.items():
-            print(f"\nSolving with {solver_name}:")
-            solve_puzzle(puzzle, solver_func)
-
-if __name__ == "__main__":
-    main()
+    print("\nSolving the puzzle...")
+    solution, time_taken = puzzle.solve()
+    if solution:
+        print("\nSolution:")
+        puzzle.print_solution_info(time_taken)
+    else:
+        print("No solution exists.")
