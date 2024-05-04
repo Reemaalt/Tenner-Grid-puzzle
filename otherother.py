@@ -79,8 +79,8 @@ class TennerGridCSP:
 
 # Example usage
 if __name__ == "__main__":
-    rows = 10
-    columns = 3
+    rows = 
+    columns = 10
     column_sums = [random.randint(0, 45) for _ in range(columns)]
 
     print("Initial state:")
