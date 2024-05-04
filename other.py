@@ -1,5 +1,3 @@
-import random
-
 class SimpleBacktracking:
     ROWS = 4
     COLUMNS = 10
@@ -8,15 +6,6 @@ class SimpleBacktracking:
     total_cons = 0
     total_assign = 0
     divide = 0
-
-    @staticmethod
-    def generate_grid():
-        grid = [[-1 for _ in range(SimpleBacktracking.COLUMNS)] for _ in range(SimpleBacktracking.ROWS)]
-        for i in range(SimpleBacktracking.ROWS):
-            for j in range(SimpleBacktracking.COLUMNS):
-                if random.random() < 0.5:
-                    grid[i][j] = random.randint(0, 9)
-        return grid
 
     @staticmethod
     def simple_backtrack(grid, row, col):
@@ -44,13 +33,11 @@ class SimpleBacktracking:
 
     @staticmethod
     def is_safe(grid, row, col, num):
-        # Check if num is already in the same row
         for x in range(SimpleBacktracking.COLUMNS):
             SimpleBacktracking.consistency += 1
             if grid[row][x] == num:
                 return False
 
-        # Check if num is already in the same column
         try:
             SimpleBacktracking.consistency += 1
             if grid[row - 1][col] == num:
@@ -79,7 +66,47 @@ class SimpleBacktracking:
         except IndexError:
             SimpleBacktracking.consistency -= 1
 
-        # Other checks for diagonals and sum constraints
+        try:
+            SimpleBacktracking.consistency += 1
+            if grid[row + 1][col + 1] == num:
+                return False
+        except IndexError:
+            SimpleBacktracking.consistency -= 1
+
+        try:
+            SimpleBacktracking.consistency += 1
+            if grid[row - 1][col - 1] == num:
+                return False
+        except IndexError:
+            SimpleBacktracking.consistency -= 1
+
+        try:
+            SimpleBacktracking.consistency += 1
+            if grid[row + 1][col - 1] == num:
+                return False
+        except IndexError:
+            SimpleBacktracking.consistency -= 1
+
+        try:
+            if grid[row - 1][col + 1] == num:
+                SimpleBacktracking.consistency += 1
+                return False
+        except IndexError:
+            SimpleBacktracking.consistency -= 1
+
+        sum_val = 0
+        for i in range(SimpleBacktracking.ROWS - 1):
+            if grid[i][col] != -1:
+                sum_val += grid[i][col]
+
+        SimpleBacktracking.consistency += 1
+        sum_val += num
+
+        if sum_val > grid[SimpleBacktracking.ROWS - 1][col]:
+            return False
+
+        if row == SimpleBacktracking.ROWS - 2 and sum_val != grid[SimpleBacktracking.ROWS - 1][col]:
+            return False
 
         return True
 
@@ -126,21 +153,80 @@ class SimpleBacktracking:
                 flag = False
                 break
 
-            if 1 <= x <= 5:
-                grid = SimpleBacktracking.generate_grid()
+            if x == 1:
+                f = [
+                    [-1, 6, 2, 0, -1, -1, -1, 8, 5, 7],
+                    [-1, 0, 1, 7, 8, -1, -1, -1, 9, -1],
+                    [-1, 4, -1, -1, 2, -1, 3, 7, -1, 8],
+                    [13, 10, 8, 7, 19, 16, 11, 19, 15, 17]
+                ]
+                grid = f
+                SimpleBacktracking.print_initial_state(grid)
+                if SimpleBacktracking.simple_backtrack(grid, 0, 0):
+                    SimpleBacktracking.print_grid(grid)
+                else:
+                    print("No Solution exists")
+            elif x == 2:
+                s = [
+                    [-1, -1, 5, 3, -1, -1, 6, -1, -1, -1],
+                    [0, 7, -1, 4, 6, 5, -1, -1, 1, 3],
+                    [-1, 2, 3, 7, -1, 4, -1, 6, 5, -1],
+                    [10, 13, 17, 14, 8, 16, 14, 17, 14, 12]
+                ]
+                grid = s
+                SimpleBacktracking.print_initial_state(grid)
+                if SimpleBacktracking.simple_backtrack(grid, 0, 0):
+                    SimpleBacktracking.print_grid(grid)
+                else:
+                    print("No Solution exists")
+            elif x == 3:
+                t = [
+                    [4, -1, -1, -1, 2, 0, -1, 1, -1, 9],
+                    [7, -1, -1, 5, -1, -1, -1, 2, -1, 6],
+                    [4, -1, -1, 9, 7, -1, -1, -1, -1, 3],
+                    [15, 11, 10, 20, 17, 4, 23, 3, 14, 18]
+                ]
+                grid = t
+                SimpleBacktracking.print_initial_state(grid)
+                if SimpleBacktracking.simple_backtrack(grid, 0, 0):
+                    SimpleBacktracking.print_grid(grid)
+                else:
+                    print("No Solution exists")
+            elif x == 4:
+                fo = [
+                    [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+                    [-1, 4, -1, -1, -1, 9, -1, -1, 2, -1],
+                    [-1, 1, 9, 5, 8, 4, -1, 7, 6, 3],
+                    [13, 14, 20, 13, 13, 18, 10, 14, 12, 8]
+                ]
+                grid = fo
+                SimpleBacktracking.print_initial_state(grid)
+                if SimpleBacktracking.simple_backtrack(grid, 0, 0):
+                    SimpleBacktracking.print_grid(grid)
+                else:
+                    print("No Solution exists")
+            elif x == 5:
+                fi = [
+                    [5, 7, -1, 0, -1, 1, -1, -1, -1, -1],
+                    [1, -1, -1, 6, 7, -1, -1, 5, 4, -1],
+                    [-1, -1, -1, -1, -1, -1, 1, 7, 2, -1],
+                    [14, 12, 17, 15, 19, 10, 14, 18, 9, 7]
+                ]
+                grid = fi
                 SimpleBacktracking.print_initial_state(grid)
                 if SimpleBacktracking.simple_backtrack(grid, 0, 0):
                     SimpleBacktracking.print_grid(grid)
                 else:
                     print("No Solution exists")
 
-                if flag:
-                    print("consistency:", SimpleBacktracking.consistency)
-                    print("assignments:", SimpleBacktracking.assignments)
-                    SimpleBacktracking.reset_counters()
+            if flag:
+                print("consistency:", SimpleBacktracking.consistency)
+                print("assignments:", SimpleBacktracking.assignments)
+                SimpleBacktracking.reset_counters()
 
         print("average consistency:", (SimpleBacktracking.total_cons / SimpleBacktracking.divide))
         print("average assignments:", (SimpleBacktracking.total_assign / SimpleBacktracking.divide))
+
 
 if __name__ == "__main__":
     SimpleBacktracking.main()
